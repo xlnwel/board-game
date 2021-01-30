@@ -1,8 +1,7 @@
 #ifndef GAME_HEX_BOARD_H_
 #define GAME_HEX_BOARD_H_
 
-#include <iostream>
-#include <string>
+#include <array>
 #include "board.hpp"
 
 namespace game {
@@ -15,6 +14,8 @@ namespace game {
         std::make_pair(1, -1),
     };
 
+    std::vector<Point> get_adjacent_points_hex(const Board::type&, Point, Piece);
+
     class HexBoard: public Board {
     public:
         explicit HexBoard(int n=11);
@@ -23,12 +24,15 @@ namespace game {
 
         HexBoard& operator=(const HexBoard&);
         HexBoard& operator=(HexBoard&&);
+
         ~HexBoard() {}
 
-        virtual void display() const override final;
-        std::vector<Point> get_adjacent_points(Point, Piece) const;
+        void display() const final;
+
+        // Functions for Hex
+        std::vector<Point> get_adjacent_points(Point p, Piece piece) const;
     private:
-        bool is_valid(int i, int j) const override final { return get_piece(i, j) == Piece::Blank; }
+        bool is_valid(int i, int j) const final { return get_piece(i, j) == Piece::Blank; }
     };
 }
 

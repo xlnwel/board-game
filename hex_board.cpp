@@ -50,32 +50,15 @@ void HexBoard::display() const {
     }
 }
 
-
-std::vector<Point> HexBoard::get_adjacent_points(Point p, Piece piece) const {
-    int i = get<0>(p), j = get<1>(p);
+vector<Point> game::HexBoard::get_adjacent_points(Point point, Piece piece) const {
+    int i = point.first, j = point.second;
+    int n = get_board_size();
     std::vector<Point> ans;
-    for (const auto& x: HexNeighbor) {
-        auto m = i + get<0>(x), n = j + get<1>(x);
-        Point p = std::make_pair(m, n);
-        if (is_on_board(m, n) && get_piece(m, n) == piece) {
-            ans.push_back(p);
+    for (const auto& s: HexNeighbor) {
+        int x = i + s.first, y = j + s.second;
+        if (is_on_board(x, y) && get_piece(x, y) == piece) {
+            ans.push_back(make_pair(x, y));
         }
     }
     return ans;
 }
-
-// int main() {
-//     HexBoard board(4);
-//     board.display();
-//     board.move(make_pair(0, 0), Piece::White);
-//     board.move(make_pair(0, 1), Piece::Black);
-//     board.display();
-//     board.move(make_pair(1, 0), Piece::White);
-//     board.move(make_pair(1, 2), Piece::White);
-//     board.display();
-//     board.move(make_pair(2, 0), Piece::White);
-//     board.move(make_pair(2, 2), Piece::Black);
-//     board.display();
-//     board.move(make_pair(3, 0), Piece::White);
-//     board.display();
-// }
