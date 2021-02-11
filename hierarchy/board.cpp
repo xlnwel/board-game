@@ -1,4 +1,7 @@
+#include <unordered_map>
+
 #include "board.hpp"
+#include "hex_board.hpp"
 
 using namespace std;
 using namespace game;
@@ -36,4 +39,14 @@ bool RhombusBoard::move(Point p, Piece piece) {
 ostream& operator<<(ostream& os, const Board& board) {
     board.display(os);
     return os;
+}
+
+unique_ptr<Board> game::make_board(const string& type, int n) {
+    enum class BoardType {Hex};
+    unordered_map<string_view, BoardType> type_map{
+        {"Hex", BoardType::Hex},
+    };
+    switch (type_map[type]) {
+        case BoardType::Hex: return unique_ptr<Board>(new HexBoard(n));
+    }
 }

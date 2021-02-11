@@ -15,6 +15,7 @@ namespace game {
         Game(const Board& b, Piece p=Piece::Blank);
         Game(std::unique_ptr<Board>&& b, Piece p=Piece::Blank);
 
+        void play(const Player*, const Player*) const;
         bool terminal_test(const State& s) const { return s.get_utility() != 0 || s.get_valid_moves().empty(); }
         // copy the state, update it and return
         State result(State, Point, Piece) const;
@@ -23,7 +24,6 @@ namespace game {
         int compute_utility(const State&) const;
         State init_state;
     };
-    void play(const Game&, const Player*, const Player*);
 }
 
 #endif

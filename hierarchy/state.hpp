@@ -1,14 +1,15 @@
 #ifndef GAME_STATE_H_
 #define GAME_STATE_H_
 
+#include <iostream>
 #include <vector>
 #include <memory>
 #include <unordered_set>
 
 #include "basics.hpp"
-#include "board.hpp"
 
 namespace game {
+    class Board;
     class State {
     public:
         State(const Board& b, Piece p=Piece::Blank, std::size_t u=0);
@@ -19,8 +20,8 @@ namespace game {
         State& operator=(const State&);
         State& operator=(State&&);
         
-        void display(std::ostream& os=std::cout) const { board->display(os); }
-        bool is_over() const { return board->is_over(curr_move, curr_piece); }
+        void display(std::ostream& os=std::cout) const;
+        bool is_over() const;
 
         /* Modifiers */
         bool update_board(Point, Piece);

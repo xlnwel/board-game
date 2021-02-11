@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "state.hpp"
 #include "game.hpp"
 
@@ -21,25 +23,25 @@ int Game::compute_utility(const State& state) const {
     return state.is_over();
 }
 
-void game::play(const Game& g, const Player* p1, const Player* p2) {
-    auto s = g.get_initial_state();
+void Game::play(const Player* p1, const Player* p2) const {
+    auto s = get_initial_state();
     assert(p1->get_piece() != p2->get_piece());
     if (p1->get_piece() != s.to_move())
         swap(p1, p2);
     size_t i = 0;
     Point m;
     Piece p;
-    while (!g.terminal_test(s)) {
+    while (!terminal_test(s)) {
         s.display();
         if (i % 2 == 0) {
-            m = p1->get_move(g, s);
+            m = p1->get_move(*this, s);
             p = p1->get_piece();
         }
         else {
-            m = p2->get_move(g, s);
+            m = p2->get_move(*this, s);
             p = p2->get_piece();
         }
-        s = g.result(s, m, p);
+        s = result(s, m, p);
         i = (i+1) % 2;
     }
     s.display();

@@ -5,7 +5,7 @@
 #include "minmax_player.hpp"
 #include "alphabeta_player.hpp"
 #include "game.hpp"
-#include "hex_board.hpp"
+#include "board.hpp"
 #include "state.hpp"
 
 using namespace std;
@@ -16,9 +16,8 @@ int main() {
     cout << "Board size:\n";
     cin >> n;
     
-    HexBoard hex(n);
-    Game game(hex);
+    Game g(make_board("Hex", n)); 
     AlphaBetaPlayer p1(Piece::White);
     AlphaBetaPlayer p2(Piece::Black);
-    play(game, &p1, &p2);
+    g.play(&p1, &p2);
 }

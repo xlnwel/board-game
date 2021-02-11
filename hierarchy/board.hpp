@@ -2,6 +2,7 @@
 #define GAME_BOARD_H_
 
 #include <iostream>
+#include <memory>
 #include <vector>
 #include <unordered_set>
 #include <string>
@@ -58,6 +59,7 @@ namespace game {
     };
 
     std::ostream& operator<<(std::ostream& os, const Board& board);
+    std::unique_ptr<Board> make_board(const std::string& type, int n);
 }
 
 #endif

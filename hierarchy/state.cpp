@@ -1,4 +1,5 @@
 #include "state.hpp"
+#include "board.hpp"
 
 using namespace std;
 using namespace game;
@@ -48,6 +49,14 @@ State& State::operator=(State&& rhs) {
         swap(valid_moves, rhs.valid_moves);
     }
     return *this;
+}
+
+void State::display(ostream& os) const {
+    board->display(os);
+}
+
+bool State::is_over() const { 
+    return board->is_over(curr_move, curr_piece); 
 }
 
 bool State::update_board(Point point, Piece piece) {
