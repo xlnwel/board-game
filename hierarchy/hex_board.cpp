@@ -3,21 +3,13 @@
 #include <utility>
 
 #include "hex_board.hpp"
+#include "color_font.hpp"
 
 using namespace std;
 using namespace game;
 
 
 void HexBoard::display(std::ostream& os) const {
-    static constexpr string_view RESET("\033[0m");
-    static constexpr string_view BLACK("\033[30m");
-    static constexpr string_view RED("\033[31m");
-    static constexpr string_view GREEN("\033[32m");
-    static constexpr string_view YELLOW("\033[33m");
-    static constexpr string_view BLUE("\033[34m");
-    static constexpr string_view magenta("\033[35m");
-    static constexpr string_view CYAN("\033[36m");
-    static constexpr string_view WHITE("\033[37m");
     auto n = get_board_size();
     for (auto i = 0; i != n; ++i) {
         os << std::string(i, ' ');
@@ -26,9 +18,9 @@ void HexBoard::display(std::ostream& os) const {
             switch (x) {
                 case Piece::Blank: os << ". "; 
                     break;
-                case Piece::White: os << WHITE << "x " << RESET; 
+                case Piece::White: os << font::WHITE << "x " << font::RESET; 
                     break;
-                case Piece::Black: os << BLACK << "o " << RESET; 
+                case Piece::Black: os << font::BLACK << "o " << font::RESET; 
                     break;
             }
         }
