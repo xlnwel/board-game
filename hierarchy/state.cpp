@@ -13,8 +13,8 @@ State::State(const Board& b, Piece p, Point m):
 
 State::State(unique_ptr<Board>&& b, Piece p, Point m):
         board(std::move(b)), curr_piece(p), curr_move(m) {
-    valid_moves = board->get_valid_moves();
     utility = compute_score(board->result(m, p));
+    valid_moves = board->get_valid_moves();
 }
 
 State::State(const State& rhs): 
@@ -61,4 +61,8 @@ std::unique_ptr<Board> State::copy_board() const {
 ostream& game::operator<<(ostream& os, const State& state) {
     state.display(os);
     return os;
+}
+
+void State::compute_utility() const { 
+    utility = board->compute_utility(curr_piece); 
 }

@@ -5,4 +5,5 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project(Game)
 
-add_executable(Game main.cpp alphabeta_player.cpp minmax_player.cpp mcts_player.cpp board.cpp hex_board.cpp state.cpp game.cpp basics.cpp)
+AUX_SOURCE_DIRECTORY(${CMAKE_CURRENT_SOURCE_DIR} SRCS)
+add_executable(game ${SRCS})

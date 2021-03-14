@@ -1,7 +1,8 @@
-#ifndef GAME_MCTS_PLAYER_H_
-#define GAME_MCTS_PLAYER_H_
+#ifndef GAME_MCTS_MULTITHREAD_PLAYER_H_
+#define GAME_MCTS_MULTITHREAD_PLAYER_H_
 
 #include <memory>
+#include <mutex>
 #include <utility>
 #include <vector>
 
@@ -10,16 +11,16 @@
 #include "game.hpp"
 
 namespace game {
-    class MCTSPlayer: public Player {
+    class MCTSMultiThreadPlayer: public Player {
     public:
-        MCTSPlayer(Piece p, int nn, double cc=1.4);
+        MCTSMultiThreadPlayer(Piece p, int nn, double cc=1.4);
 
         Point get_move(const Game&, const State&) const override;
     private:
         struct Node {
             Node(const State& s, Node* p=nullptr): 
                 state(s), parent(p), 
-                children(state.get_valid_moves().size()),
+                children(state.get_valid_moves().size()), 
                 n(0), utility(0) {}
             Node(State&& s, Node* p=nullptr): 
                 state(std::move(s)), parent(p), 
@@ -30,7 +31,8 @@ namespace game {
             Node* parent;
             std::vector<std::unique_ptr<Node>> children;
             std::size_t n;
-            int utility;
+            double utility;
+            std::mutex m;
         };
         double ucb(Node* p) const;
         Node* select_expand(const Game&, Node*) const;

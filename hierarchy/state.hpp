@@ -25,17 +25,18 @@ namespace game {
         /* Access */
         bool is_over() const { return utility != 0 || get_valid_moves().empty(); }
         std::unique_ptr<Board> copy_board() const;
-        int get_utility() const { return utility; }
+        double get_utility() const { return utility; }
         // get utility for piece p
-        int get_utility(Piece p) const { return p == curr_piece? utility: -utility; }
+        double get_utility(Piece p) const { return p == curr_piece? utility: -utility; }
+        void compute_utility() const;
         Piece get_piece() const { return curr_piece; }
         Piece to_move() const { return next_piece(curr_piece); }
         const std::vector<Point>& get_valid_moves() const { return valid_moves; }
     private:
-        Piece curr_piece;
         std::unique_ptr<Board> board;
-        int utility;
+        Piece curr_piece;
         Point curr_move;
+        mutable double utility;
         std::vector<Point> valid_moves;
     };
 

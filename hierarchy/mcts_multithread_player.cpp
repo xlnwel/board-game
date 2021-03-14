@@ -1,24 +1,30 @@
 #include <cmath>
 #include <limits>
 #include <random>
+#include <future>
 
-#include "mcts_player.hpp"
+#include "mcts_multithread_player.hpp"
 
 using namespace std;
 using namespace game;
 
 
-MCTSPlayer::MCTSPlayer(Piece p, int nn, double cc):
+MCTSMultiThreadPlayer::MCTSMultiThreadPlayer(Piece p, int nn, double cc):
     Player(p), n(nn), c(cc) {}
 
-Point MCTSPlayer::get_move(const Game& game, const State& state) const {
+Point MCTSMultiThreadPlayer::get_move(const Game& game, const State& state) const {
     assert(!state.is_over());
     auto root = make_unique<Node>(state);
+    vector<future<void>> v(n);
     for (auto i = 0; i != n; ++i) {
-        auto leaf = select_expand(game, root.get());
-        auto result = simulate(game, leaf->state);
-        backup(leaf, result);
+        v[i] = std::async([this, game, p=root.get()]() {
+            auto leaf = select_expand(game, p);
+            auto result = simulate(game, leaf->state);
+            backup(leaf, result);
+        });
     }
+    for (auto& f: v)
+        f.get();
     int max_i = 0;
     auto max_n = 0;
     const auto& moves = state.get_valid_moves();
@@ -31,14 +37,16 @@ Point MCTSPlayer::get_move(const Game& game, const State& state) const {
     return moves[max_i];
 }
 
-double MCTSPlayer::ucb(Node* p) const {
+double MCTSMultiThreadPlayer::ucb(Node* p) const {
     // traditional ucb
-    if (p)
+    if (p) {
+        lock_guard lk{p->m};
         return p->utility / p->n + c * sqrt(log(p->parent->n) / p->n);
+    }
     return numeric_limits<double>::max();
 }
 
-MCTSPlayer::Node* MCTSPlayer::select_expand(const Game& game, Node* p) const {
+MCTSMultiThreadPlayer::Node* MCTSMultiThreadPlayer::select_expand(const Game& game, Node* p) const {
     assert(p);
     assert(!p->children.empty());
     double max_val = numeric_limits<double>::min();
@@ -65,7 +73,7 @@ MCTSPlayer::Node* MCTSPlayer::select_expand(const Game& game, Node* p) const {
     }
 }
 
-int MCTSPlayer::simulate(const Game& game, const State& s) const {
+int MCTSMultiThreadPlayer::simulate(const Game& game, const State& s) const {
     if (s.is_over())
         return s.get_utility(get_piece());
     assert(!s.get_valid_moves().empty());
@@ -79,17 +87,23 @@ int MCTSPlayer::simulate(const Game& game, const State& s) const {
     return state.get_utility(get_piece());
 }
 
-void MCTSPlayer::backup(Node* p, int v) const {
+void MCTSMultiThreadPlayer::backup(Node* p, int v) const {
     assert(p);
-    ++p->n;
-    p->utility += v;
+    {
+        lock_guard lk(p->m);
+        ++p->n;
+        p->utility += v;
+    }
     if (p->parent)
         backup(p->parent, v);
 }
-void MCTSPlayer::make_child(const Game& game, Node* p, int idx) const {
+void MCTSMultiThreadPlayer::make_child(const Game& game, Node* p, int idx) const {
     assert(p);
     auto moves = p->state.get_valid_moves();
     auto piece = p->state.to_move();
     auto state = game.result(p->state, moves[idx], piece);
-    p->children[idx] = make_unique<Node>(std::move(state), p);
+    lock_guard lk(p->m);
+    if (!p->children[idx]) {
+        p->children[idx] = make_unique<Node>(std::move(state), p);
+    }
 }

@@ -26,7 +26,7 @@ void HexBoard::display() const {
                     break;
             }
         }
-        std::cout << std::endl;
+        std::cout << '\n';
     }
 }
 

@@ -22,6 +22,7 @@ namespace game {
         virtual Result result(Point, Piece) const = 0;
         bool is_on_board(Point p) const { return is_xy_on_board(p.first, p.second); }
         bool is_valid(Point p) const { return is_xy_valid(p.first, p.second); }
+        virtual double compute_utility(Piece) const { return 0; }
 
         /* Access */
         virtual std::vector<Point> get_valid_moves() const = 0;
