@@ -19,12 +19,12 @@ namespace game {
         virtual Board* clone() const = 0;
 
         /* Queries */
-        virtual bool is_over(Point, Piece) const = 0;
+        virtual Result result(Point, Piece) const = 0;
         bool is_on_board(Point p) const { return is_xy_on_board(p.first, p.second); }
         bool is_valid(Point p) const { return is_xy_valid(p.first, p.second); }
 
         /* Access */
-        virtual std::unordered_set<Point, PointHash> get_valid_moves() const = 0;
+        virtual std::vector<Point> get_valid_moves() const = 0;
         Piece get_piece(Point p) const { return get_xy_piece(p.first, p.second); }
 
         /* Modifiers */
@@ -41,7 +41,7 @@ namespace game {
         explicit RhombusBoard(std::size_t nn);
 
         /* Access */
-        std::unordered_set<Point, PointHash> get_valid_moves() const override;
+        std::vector<Point> get_valid_moves() const override;
 
         /* Modifiers */
         bool reset(Point) override;

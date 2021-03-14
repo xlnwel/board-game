@@ -8,7 +8,7 @@
 
 
 template<>
-bool game::State<game::HexBoard>::is_over() const {
+Result game::State<game::HexBoard>::result() const {
     // perform dfs to check if the current Piece won
     auto board = get_board();
     auto n = board.get_board_size();

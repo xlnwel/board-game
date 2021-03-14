@@ -1,9 +1,10 @@
 #include <iostream>
+#include <stack>
 #include <string>
 #include <utility>
 
-#include "hex_board.hpp"
 #include "color_font.hpp"
+#include "hex_board.hpp"
 
 using namespace std;
 using namespace game;
@@ -28,18 +29,21 @@ void HexBoard::display(std::ostream& os) const {
     }
 }
 
-bool HexBoard::is_over(Point point, Piece piece) const {
+Result HexBoard::result(Point point, Piece piece) const {
     // perform dfs to check if the current Piece won
+    if (piece == Piece::Blank)
+        return Result::Unknown;
     auto board = *this;
     auto n = get_board_size();
 
     bool topdown = piece == Piece::White;
     bool first = false, second = false;
-    std::vector<Point> v{point};
+    stack<Point> v;
+    v.push(point);
     board.reset(point);
     while (!v.empty()) {
-        auto p = v.back();
-        v.pop_back();
+        auto p = v.top();
+        v.pop();
         if (topdown) {
             if (p.first == 0)
                 first = true;
@@ -54,17 +58,19 @@ bool HexBoard::is_over(Point point, Piece piece) const {
         }
         auto ps = board.get_adjacent_points(p, piece);
         for (auto x: ps) {
-            v.push_back(x);
+            v.push(x);
             board.reset(x);
         }
         if (first && second) {
-            return true;
+            return Result::Win;
         }
     }
-    return false;
+    auto result = Result::Unknown;
+    return result;
 }
 
-vector<Point> HexBoard::get_adjacent_points(Point point, Piece piece) const {
+vector<Point> HexBoard::get_adjacent_points(
+        Point point, Piece piece) const {
     std::size_t i = point.first, j = point.second;
     std::size_t n = get_board_size();
     std::vector<Point> ans;

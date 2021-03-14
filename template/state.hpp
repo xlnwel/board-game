@@ -21,7 +21,7 @@ namespace game {
         ~State() {}
         
         void display() const { board.display(); }
-        bool is_over() const;
+        Result result() const;
 
         /* Modifiers */
         bool update_board(Point, Piece);
@@ -34,13 +34,13 @@ namespace game {
         Piece get_piece() const { return curr_piece; }
         Piece to_move() const { return next_piece(curr_piece); }
         const Board& get_board() const { return board; }
-        std::unordered_set<Point, PointHash> get_valid_moves() { return valid_moves; }
+        std::vector<Point> get_valid_moves() { return valid_moves; }
     private:
         Piece curr_piece;
         Board board;
         std::size_t utility;
         Point curr_move;
-        std::unordered_set<Point, PointHash> valid_moves;
+        std::vector<Point> valid_moves;
     };
 }
 

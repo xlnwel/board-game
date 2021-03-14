@@ -11,7 +11,7 @@ namespace font {
     static constexpr std::string_view GREEN("\033[32m");
     static constexpr std::string_view YELLOW("\033[33m");
     static constexpr std::string_view BLUE("\033[34m");
-    static constexpr std::string_view magenta("\033[35m");
+    static constexpr std::string_view MAGENTA("\033[35m");
     static constexpr std::string_view CYAN("\033[36m");
     static constexpr std::string_view WHITE("\033[37m");
 }

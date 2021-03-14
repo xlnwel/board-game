@@ -9,6 +9,7 @@ namespace game {
     class Player {
     public:
         Player(Piece p): piece(p) {}
+        virtual ~Player() {}
 
         virtual Point get_move(const Game&, const State&) const = 0;
         Piece get_piece() const { return piece; }

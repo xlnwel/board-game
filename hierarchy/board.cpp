@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <iterator>
+#include <random>
 #include <unordered_map>
 
 #include "board.hpp"
@@ -9,14 +12,17 @@ using namespace game;
 
 RhombusBoard::RhombusBoard(std::size_t nn): n(nn), board(std::vector<Piece>(n*n, Piece::Blank)) {}
 
-unordered_set<Point, PointHash> RhombusBoard::get_valid_moves() const {
-    unordered_set<Point, PointHash> valid_moves;
+vector<Point> RhombusBoard::get_valid_moves() const {
+    vector<Point> valid_moves;
     for (std::size_t i = 0; i != n; ++i) {
         for (std::size_t j = 0; j != n; ++j) {
             if (is_xy_valid(i, j))
-                valid_moves.emplace(i, j);
+                valid_moves.emplace_back(i, j);
         }
     }
+    random_device rd;
+    mt19937 g(rd());
+    shuffle(valid_moves.begin(), valid_moves.end(), g);
     return valid_moves;
 }
 

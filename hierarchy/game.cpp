@@ -1,5 +1,7 @@
 #include <cassert>
+#include <sstream>
 
+#include "basics.hpp"
 #include "state.hpp"
 #include "game.hpp"
 
@@ -10,17 +12,21 @@ Game::Game(const Board& b, Piece p): init_state(b, p) {}
 
 Game::Game(unique_ptr<Board>&& b, Piece p): init_state(std::move(b), p) {}
 
-State Game::result(State state, Point m, Piece p) const {
-    auto succ = state.update_board(m, p);
+State Game::result(const State& state, Point m, Piece p) const {
+    auto new_board = state.copy_board();
+    auto succ = new_board->move(m, p);
     if (succ) {
-        auto u = compute_utility(state);
-        state.update_utility(u);
+        State new_state(std::move(new_board), p, m);
+        return new_state;
+    }
+    else {
+        ostringstream oss;
+        oss << p << " invalid move: " << m << "\nValid moves: ";
+        for (auto m: state.get_valid_moves())
+            oss << m << " ";
+        throw std::logic_error(oss.str());
     }
     return state;
-}
-
-int Game::compute_utility(const State& state) const {
-    return state.is_over();
 }
 
 void Game::play(const Player* p1, const Player* p2) const {
@@ -31,8 +37,8 @@ void Game::play(const Player* p1, const Player* p2) const {
     size_t i = 0;
     Point m;
     Piece p;
-    while (!terminal_test(s)) {
-        s.display();
+    while (!s.is_over()) {
+        // s.display();
         if (i % 2 == 0) {
             m = p1->get_move(*this, s);
             p = p1->get_piece();
@@ -46,7 +52,6 @@ void Game::play(const Player* p1, const Player* p2) const {
     }
     s.display();
     cout << get_piece_color(s.get_piece()) << " won!\n";
-    cout << "Valid moves: " << s.get_valid_moves().size() << '\n';
     cout << get_piece_color(p1->get_piece()) << " utility: " << s.get_utility(p1->get_piece()) << '\n';
     cout << get_piece_color(p2->get_piece()) << " utility: " << s.get_utility(p2->get_piece()) << '\n';
 }

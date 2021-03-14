@@ -32,7 +32,7 @@ namespace game {
         bool is_valid(Point p) const { return static_cast<const GameType*>(this)->is_valid(p.first, p.second); }
         
         /* Access */
-        std::unordered_set<Point, PointHash> get_valid_moves();
+        std::vector<Point> get_valid_moves();
         Piece get_piece(Point p) const { return get_piece(p.first, p.second); }
         std::size_t get_board_size() const { return n; }
 
@@ -100,7 +100,7 @@ bool game::Board<GameType>::move(Point p, Piece piece) {
 
 template<typename GameType>
 std::unordered_set<game::Point, game::PointHash> game::Board<GameType>::get_valid_moves() {
-    std::unordered_set<Point, PointHash> valid_moves;
+    std::vector<Point> valid_moves;
     for (std::size_t i = 0; i != n; ++i) {
         for (std::size_t j = 0; j != n; ++j) {
             if (is_xy_valid(i, j))

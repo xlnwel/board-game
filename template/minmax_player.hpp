@@ -37,7 +37,7 @@ game::MinMaxPlayer<Board>::min_value(
     auto util = game.compute_utility(state, Player<Board>::get_piece());
     if (util != 0)
         return util;
-    auto moves = state.get_valid_moves();
+    const auto& moves = state.get_valid_moves();
     auto piece = state.to_move();
     std::vector<util_move> v; 
     for (auto m: moves) {
@@ -54,7 +54,7 @@ game::MinMaxPlayer<Board>::max_value(
     auto util = game.compute_utility(state, Player<Board>::get_piece());
     if (util != 0)
         return util;
-    auto moves = state.get_valid_moves();
+    const auto& moves = state.get_valid_moves();
     auto piece = state.to_move();
     std::vector<util_move> v; 
     for (auto m: moves) {
