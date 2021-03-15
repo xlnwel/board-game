@@ -6,9 +6,9 @@
 #include <utility>
 #include <vector>
 
-#include "state.hpp"
-#include "player.hpp"
 #include "game.hpp"
+#include "player.hpp"
+#include "state.hpp"
 
 namespace game {
     class MCTSMultiThreadPlayer: public Player {

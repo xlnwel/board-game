@@ -13,6 +13,7 @@
 #include "minmax_player.hpp"
 #include "mcts_player.hpp"
 #include "mcts_multithread_player.hpp"
+#include "mcts_multithread_threadpool_player.hpp"
 
 #include "board.hpp"
 #include "game.hpp"
@@ -50,6 +51,8 @@ unique_ptr<Player> create_player(const string& s, Piece p, int n) {
         return make_unique<MCTSPlayer>(p, n);
     if (s == "MCTSMT")
         return make_unique<MCTSMultiThreadPlayer>(p, n);
+    if (s == "MCTSMTTP")
+        return make_unique<MCTSMultiThreadThreadPoolPlayer>(p, n);
     if (s == "MINMAX")
         return make_unique<MinMaxPlayer>(p);
     throw invalid_argument("Invalid player type: " + s);
