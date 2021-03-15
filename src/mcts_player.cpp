@@ -25,7 +25,7 @@ Point MCTSPlayer::get_move(const Game& game, const State& state) const {
     const auto& children = root->children;
     assert(moves.size() == children.size()); 
     for (auto i = 0; i != moves.size(); ++i) {
-        if (children[i]->n > max_n)
+        if (children[i] && children[i]->n > max_n)
             max_i = i;
     }
     return moves[max_i];

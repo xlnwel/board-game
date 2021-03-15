@@ -18,19 +18,22 @@ Point MCTSMultiThreadThreadPoolPlayer::get_move(
         const Game& game, const State& state) const {
     assert(!state.is_over());
     auto root = make_unique<Node>(state);
-    auto n_threads = std::thread::hardware_concurrency() - 1;
     {
+        auto n_threads = std::thread::hardware_concurrency() - 1;
+        int sim_per_thread = n / (n_threads+1);
         ThreadPool<void()> tp(n_threads);
         vector<future<void>> v(n_threads);
-        int sim_per_thread = n / (n_threads+1);
         auto task = [this](const Game& game, Node* root, int sim_per_thread) {
             for (auto i = 0; i != sim_per_thread; ++i) {
+                assert(root);
                 auto leaf = select_expand(game, root);
+                assert(leaf);
                 auto result = simulate(game, leaf->state);
+                assert(result != 0);
                 backup(leaf, result);
             }
         };
-        for (auto i = 0; i != n_threads - 1; ++i) {
+        for (auto i = 0; i != n_threads; ++i) {
             v[i] = tp.submit(task, game, root.get(), sim_per_thread);
         }
         task(game, root.get(), n - sim_per_thread * n_threads);
@@ -43,7 +46,7 @@ Point MCTSMultiThreadThreadPoolPlayer::get_move(
     const auto& children = root->children;
     assert(moves.size() == children.size()); 
     for (auto i = 0; i != moves.size(); ++i) {
-        if (children[i]->n > max_n)
+        if (children[i] && children[i]->n > max_n)
             max_i = i;
     }
     return moves[max_i];

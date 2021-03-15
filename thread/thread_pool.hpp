@@ -4,6 +4,7 @@
 #include <atomic>
 #include <algorithm>
 #include <chrono>
+#include <iostream>
 #include <functional>
 #include <future>
 #include <memory>
@@ -21,12 +22,12 @@ namespace thread_utils {
         ~ThreadPool();
 
         template<typename FuncType, typename... Args, // a separate FuncType required for lambda functions
-            typename ReturnType=typename std::result_of<
-                std::decay_t<FuncType>(std::decay_t<Args>...)>::type>
+            typename ReturnType=typename std::invoke_result<
+                std::decay_t<FuncType>, std::decay_t<Args>...>::type>
         std::future<ReturnType> submit(FuncType&& f, Args&&...args);
         template<typename FuncType, typename... Args, 
-            typename ReturnType=typename std::result_of<
-                std::decay_t<FuncType>(std::decay_t<Args>...)>::type>
+            typename ReturnType=typename std::invoke_result<
+                std::decay_t<FuncType>, std::decay_t<Args>...>::type>
         std::future<ReturnType> submit_local(FuncType&& f, Args&&...args);
         void stop();    // stop may delay until the current task in each thread is finished
         void restart();
@@ -94,7 +95,7 @@ namespace thread_utils {
                 task();
             else {
                 using namespace std::chrono_literals;
-                std::this_thread::sleep_for(200ms);
+                std::this_thread::sleep_for(1s);
             }
         }
     }

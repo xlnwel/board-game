@@ -3,16 +3,16 @@
 #include <random>
 #include <future>
 
-#include "mcts_mt_lf_player.hpp"
+#include "mcts_eval_multithread_player.hpp"
 
 using namespace std;
 using namespace game;
 
 
-MCTSMultiThreadLockFreePlayer::MCTSMultiThreadLockFreePlayer(Piece p, int nn, double cc):
+MCTSEvaluationMultiThreadPlayer::MCTSEvaluationMultiThreadPlayer(Piece p, int nn, double cc):
     Player(p), n(nn), c(cc) {}
 
-Point MCTSMultiThreadLockFreePlayer::get_move(const Game& game, const State& state) const {
+Point MCTSEvaluationMultiThreadPlayer::get_move(const Game& game, const State& state) const {
     assert(!state.is_over());
     auto root = make_unique<Node>(state);
     vector<future<void>> v(n);
@@ -37,16 +37,16 @@ Point MCTSMultiThreadLockFreePlayer::get_move(const Game& game, const State& sta
     return moves[max_i];
 }
 
-double MCTSMultiThreadLockFreePlayer::ucb(Node* p) const {
+double MCTSEvaluationMultiThreadPlayer::ucb(Node* p) const {
     // traditional ucb
     if (p) {
-        return p->utility.load(memory_order_relaxed) / p->n.load(memory_order_relaxed) 
-            + c * sqrt(log(p->parent->n.load(memory_order_relaxed)) / p->n.load(memory_order_relaxed));
+        lock_guard lk{p->m};
+        return p->utility / p->n + c * sqrt(log(p->parent->n) / p->n);
     }
     return numeric_limits<double>::max();
 }
 
-MCTSMultiThreadLockFreePlayer::Node* MCTSMultiThreadLockFreePlayer::select_expand(const Game& game, Node* p) const {
+MCTSEvaluationMultiThreadPlayer::Node* MCTSEvaluationMultiThreadPlayer::select_expand(const Game& game, Node* p) const {
     assert(p);
     assert(!p->children.empty());
     double max_val = numeric_limits<double>::min();
@@ -73,32 +73,22 @@ MCTSMultiThreadLockFreePlayer::Node* MCTSMultiThreadLockFreePlayer::select_expan
     }
 }
 
-int MCTSMultiThreadLockFreePlayer::simulate(const Game& game, const State& s) const {
-    if (s.is_over())
-        return s.get_utility(get_piece());
-    assert(!s.get_valid_moves().empty());
-    auto state = game.result(s, s.get_valid_moves()[0], s.to_move());
-    while (!state.is_over()) {
-        state = game.result(
-            state, 
-            state.get_valid_moves()[0], 
-            state.to_move());
-    }
-    return state.get_utility(get_piece());
+double MCTSEvaluationMultiThreadPlayer::simulate(const Game& game, const State& s) const {
+    s.compute_utility();
+    return s.get_utility(get_piece());
 }
 
-void MCTSMultiThreadLockFreePlayer::backup(Node* p, int v) const {
+void MCTSEvaluationMultiThreadPlayer::backup(Node* p, double v) const {
     assert(p);
     {
-        p->n.fetch_add(1, memory_order_relaxed);
-        auto util = p->utility.load(memory_order_relaxed);
-        while (!p->utility.compare_exchange_weak(util, v, 
-            memory_order_relaxed, memory_order_relaxed));
+        lock_guard lk(p->m);
+        ++p->n;
+        p->utility += v;
     }
     if (p->parent)
         backup(p->parent, v);
 }
-void MCTSMultiThreadLockFreePlayer::make_child(const Game& game, Node* p, int idx) const {
+void MCTSEvaluationMultiThreadPlayer::make_child(const Game& game, Node* p, int idx) const {
     assert(p);
     auto moves = p->state.get_valid_moves();
     auto piece = p->state.to_move();

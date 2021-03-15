@@ -16,11 +16,13 @@ namespace game {
         Game(std::unique_ptr<Board>&& b, Piece p=Piece::Blank);
 
         void play(const Player*, const Player*) const;
-        // copy the state, update it and return
         State result(const State&, Point, Piece) const;
         State get_initial_state() const { return init_state; }
+        double compute_win_rate(Piece) const;
     private:
         State init_state;
+        mutable int win1;
+        mutable int win2;
     };
 }
 

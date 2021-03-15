@@ -60,15 +60,15 @@ namespace thread_utils {
             std::unique_ptr<Node> next;
         };
 
-        Node* get_tail() {
+        Node* get_tail() const {
             std::lock_guard l(tail_mutex);
             return tail;
         }
-        Node* get_head() {
+        Node* get_head() const {
             std::lock_guard l(head_mutex);
             return head.get();
         }
-        std::unique_lock<std::mutex> get_head_lock() {
+        std::unique_lock<std::mutex> get_head_lock() const {
             std::unique_lock l(head_mutex);
             data_cond.wait(l, [this] { return head.get() != get_tail(); });
             return l;
@@ -80,10 +80,10 @@ namespace thread_utils {
         }
 
         std::unique_ptr<Node> head;
-        std::mutex head_mutex;
         Node* tail;
-        std::mutex tail_mutex;
-        std::condition_variable data_cond;
+        mutable std::mutex head_mutex;
+        mutable std::mutex tail_mutex;
+        mutable std::condition_variable data_cond;
     };
 
     template<typename T>

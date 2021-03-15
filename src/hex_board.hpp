@@ -10,7 +10,7 @@
 namespace game {
     class HexBoard: public RhombusBoard {
     public:
-        explicit HexBoard(std::size_t nn=11): RhombusBoard(nn) {}
+        explicit HexBoard(std::size_t nn=9): RhombusBoard(nn) {}
 
         void display(std::ostream& os=std::cout) const final;
         HexBoard* clone() const final { return new HexBoard(*this);}

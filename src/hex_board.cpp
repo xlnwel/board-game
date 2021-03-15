@@ -98,9 +98,6 @@ double HexBoard::compute_utility(Piece piece) const {
     }
     auto white_score = static_cast<double>(down - top + 1) / n;
     auto black_score = static_cast<double>(right - left + 1) / n;
-    // display();
-    // cout << piece << down - top + 1 << " " << right - left + 1 << endl;
-    // assert(false);
     return piece == Piece::White? white_score - black_score: black_score - white_score;
 }
 
