@@ -8,7 +8,7 @@ Several AI algorithms on Game Hex:
 - [x]: Monte Carlo Tree Search
 - [x]: Monte Carlo Tree Search (Concurrent version)
 
-## Get Start
+## Get Started
 
 ```
 mkdir build && cd build
