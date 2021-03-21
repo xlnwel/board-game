@@ -1,3 +1,4 @@
+#include <cassert>
 #include "minmax_player.hpp"
 
 using namespace std;

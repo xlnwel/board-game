@@ -8,3 +8,7 @@ project(Game)
 AUX_SOURCE_DIRECTORY(src SRCS)
 AUX_SOURCE_DIRECTORY(thread SRCS)
 add_executable(game ${SRCS})
+
+if (UNIX)
+    TARGET_LINK_LIBRARIES(game pthread)
+endif (UNIX)

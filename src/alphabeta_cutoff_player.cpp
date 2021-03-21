@@ -1,3 +1,4 @@
+#include <cassert>
 #include <limits>
 #include "alphabeta_cutoff_player.hpp"
 
